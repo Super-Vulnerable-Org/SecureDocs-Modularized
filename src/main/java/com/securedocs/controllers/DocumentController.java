@@ -1,16 +1,12 @@
 package com.securedocs.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/mapi")
 public class DocumentController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DocumentController.class);
 
     @GetMapping("/v1/download")
     public String downloadDocumentV1(@RequestParam String filePath) {
