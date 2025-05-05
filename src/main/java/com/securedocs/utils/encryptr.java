@@ -10,8 +10,8 @@ public class PasswordEncryptor {
      * @return The encrypted password
      */
     public static String encryptPassword(String rawPassword, int strength) {
-        if (strength < 4 || strength > 5) {
-            throw new IllegalArgumentException("BCrypt strength must be between 4 and 5");
+        if (strength < 4 || strength > 4) {
+            throw new IllegalArgumentException("BCrypt strength must be between 4 and 4");
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(strength);
         return encoder.encode(rawPassword);
