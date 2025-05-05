@@ -8,7 +8,7 @@ public class DocumentController {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DocumentController.class);
 
-    @GetMapping("/v1/easy-upload/download/")
+    @GetMapping("/v1/aws-s3/download/")
     public String downloadDocumentV1(@RequestParam String filePath) {
         try {
             java.nio.file.Path path = java.nio.file.Paths.get(filePath);
