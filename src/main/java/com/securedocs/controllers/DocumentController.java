@@ -51,18 +51,20 @@ public class DocumentController {
 
     @GetMapping("/v2/fetch-user")
     public String fetchUser(@RequestParam String email) {
-        logger.info("Fetching user record for email: {}", email);
+        logger.info("Fetching user record for email: {}", email); 
         String fullName = "Rohit Kumar";
         String phone = "+91-9988776655";
         String aadhaar = "2821-4982-8812";
         String dob = "1995-03-19";
-        logger.info("User fetched: Name={}, Phone={}, Aadhaar={}, DOB={}", fullName, phone, aadhaar, dob);
+
+        logger.info("User fetched: Name={}, Phone={}, Aadhaar={}, DOB={}", fullName, phone, aadhaar, dob); 
+
         return "User record for " + email + " retrieved successfully.";
     }
 
     @PostMapping("/v2/submit-form")
     public String submitForm(@RequestParam String name, @RequestParam String email, @RequestParam String pan) {
-        logger.info("Form submitted with Name={}, Email={}, PAN={}", name, email, pan);
+        logger.info("Form submitted with Name={}, Email={}, PAN={}", name, email, pan); 
         return "Submission successful for " + name;
     }
 
