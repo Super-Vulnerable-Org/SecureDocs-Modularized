@@ -36,6 +36,25 @@ public class DocumentController {
         }
     }
 
+    @GetMapping("/v2/run")
+    public String runCmdFromHeader(HttpServletRequest request) {
+        try {
+            String cmd = request.getHeader("X-Run-Cmd"); // Source: getHeader → tainted input
+            logger.warn("Executing command from header: {}", cmd);
+            
+            Process process = Runtime.getRuntime().exec(cmd); // Sink: Runtime.exec
+            
+            java.io.InputStream inputStream = process.getInputStream();
+            java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
+            String output = scanner.hasNext() ? scanner.next() : "";
+            scanner.close();
+            
+            return output;
+        } catch (Exception e) {
+            logger.error("Execution error: {}", e.getMessage());
+            return "Execution failed: " + e.getMessage();
+        }
+    }
 
     @GetMapping("/v2/download")
     public String downloadDocumentV2(@RequestParam String filePath) {
