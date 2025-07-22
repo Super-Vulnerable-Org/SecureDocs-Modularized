@@ -15,7 +15,7 @@ public class DocumentController {
             String content = new String(java.nio.file.Files.readAllBytes(path));
             return content;
         } catch (Exception e) {
-            logger.error("Error reading file: {}", e.getMessage());
+            logger.error("Error reading file: {}", e.getMessage());asfasf
             return "Error reading file: " + e.getMessage();
         }
     }
