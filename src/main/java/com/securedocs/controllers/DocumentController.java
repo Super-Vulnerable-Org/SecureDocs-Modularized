@@ -3,7 +3,7 @@ package com.securedocs.controllers;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/mapi")
+@RequestMapping("/mapi")sdfsfsf
 public class DocumentController {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DocumentController.class);
