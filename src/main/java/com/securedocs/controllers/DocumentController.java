@@ -3,7 +3,7 @@ package com.securedocs.controllers;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/mapi")
+@RequestMapping("/mapi")sdfsfsf
 public class DocumentController {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DocumentController.class);
@@ -15,7 +15,7 @@ public class DocumentController {
             String content = new String(java.nio.file.Files.readAllBytes(path));
             return content;
         } catch (Exception e) {
-            logger.error("Error reading file: {}", e.getMessage());
+            logger.error("Error reading file: {}", e.getMessage());asfasf
             return "Error reading file: " + e.getMessage();
         }
     }
