@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>SecureDocs</name>
-    <description>Demo project showing LFI and its mitigation</description>
+    <description>Demo project showing LFI and its mitigations</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
