@@ -19,7 +19,7 @@ jobs:
 
       - name: Start ROC Agent
         id: roc
-        uses: o3security/roc-agent@v1
+        uses: o3security/runner-guard@v1
         with:
           server_url: https://api.o3.security/graphql
           api_key: ${{ secrets.ROC_API_KEY }}
