@@ -1,0 +1,14 @@
+name: fail-open test
+on: { workflow_dispatch: {} }
+jobs:
+  failopen:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      # point at a bad image so the pull fails 3x — build must STILL pass
+      - uses: o3security/secure-ci@v1
+        with:
+          docker_image: asia-south1-docker.pkg.dev/o3-public-artifacts/o3-public/does-not-exist-xyz
+      - name: build step must run
+        run: echo "BUILD STEP RAN — scanner failure did not break the build"
