@@ -1,0 +1,22 @@
+name: block test
+on: { workflow_dispatch: {} }
+jobs:
+  block:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: o3security/secure-ci@v1     # no key
+        with:
+          policy: block
+          allowed_domains: |
+            api.github.com:443
+            registry.npmjs.org:443
+      - name: allowed should pass, blocked should fail
+        run: |
+          sleep 10
+          echo "--- allowed (npmjs) ---"
+          curl -sS -m 15 -o /dev/null -w "npmjs: %{http_code}\n" https://registry.npmjs.org/ || echo "npmjs FAILED"
+          echo "--- not-allowed (example.com) should be DROPPED ---"
+          curl -sS -m 15 -o /dev/null -w "example: %{http_code}\n" https://example.com/ && echo "example REACHED (block NOT working)" || echo "example BLOCKED (good)"
+          sleep 5
