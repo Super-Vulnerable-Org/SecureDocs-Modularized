@@ -6,14 +6,23 @@ jobs:
     permissions: { contents: read }
     steps:
       - uses: actions/checkout@v4
-      - uses: o3security/secure-ci@v1     # NO api_key
+      - uses: o3security/secure-ci@v1
         with:
           runtime_security: "true"
-      - name: trigger runtime detections
+      - name: warm up, then trigger real detections
         run: |
+          # give the eBPF agent time to attach its probes before doing anything
+          echo "waiting for agent to attach probes..."
+          sleep 35
+          echo "=== triggering behaviours the bundled rules watch for ==="
+          # privesc via sudo (not the sudo/login binaries themselves)
+          sudo id || true
+          # sensitive/log file access
+          sudo cat /var/log/auth.log 2>/dev/null | head -1 || true
+          sudo cat /etc/shadow 2>/dev/null | head -1 || true
+          # ptrace (kernel-exploit rule)
+          strace -f -e trace=ptrace true 2>/dev/null || true
+          # node touching a secret file (exfil rule)
+          echo "SECRET=abc" > .env
+          node -e "console.log(require('fs').readFileSync('.env','utf8'))" || true
           sleep 15
-          # things the bundled rules watch for: sensitive file access, suspicious exec
-          cat /etc/shadow 2>/dev/null || sudo cat /etc/shadow 2>/dev/null || true
-          cat /etc/passwd > /dev/null || true
-          curl -s -o /dev/null https://example.com/ || true
-          sleep 10
