@@ -19,7 +19,7 @@ jobs:
 
       - name: Start Runner Guard
         id: guard
-        uses: o3security/runner-guard@v1
+        uses: o3security/runner-shield@v1
         with:
           server_url: https://api.o3.security/graphql
           api_key: ${{ secrets.O3_API_KEY }}
