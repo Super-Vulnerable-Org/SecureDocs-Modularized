@@ -1,0 +1,18 @@
+name: Secure CI - no auth test
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      # Zero config — no api_key, no project_name, nothing.
+      - uses: o3security/secure-ci@v1
+      - name: Some build traffic
+        run: |
+          sleep 8
+          curl -s -o /dev/null https://registry.npmjs.org/ || true
+          curl -s -o /dev/null https://example.com/ || true
+          sleep 6
