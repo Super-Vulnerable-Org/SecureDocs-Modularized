@@ -1,0 +1,19 @@
+name: kayo free test
+on: { workflow_dispatch: {} }
+jobs:
+  kayo-free:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: o3security/secure-ci@v1     # NO api_key
+        with:
+          runtime_security: "true"
+      - name: trigger runtime detections
+        run: |
+          sleep 15
+          # things the bundled rules watch for: sensitive file access, suspicious exec
+          cat /etc/shadow 2>/dev/null || sudo cat /etc/shadow 2>/dev/null || true
+          cat /etc/passwd > /dev/null || true
+          curl -s -o /dev/null https://example.com/ || true
+          sleep 10
