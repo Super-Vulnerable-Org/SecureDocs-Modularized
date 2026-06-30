@@ -1,0 +1,29 @@
+name: kayo detect proof
+on: { workflow_dispatch: {} }
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: o3security/secure-ci@v1
+        with:
+          runtime_security: "true"
+          debug: "true"
+      - name: long warmup so eBPF probes are fully attached
+        run: |
+          echo "waiting 60s for probes to attach..."
+          sleep 60
+      - name: trigger privesc rule (setuid->root from a non-sudo binary)
+        run: |
+          # a C program that calls setuid(0) directly -> hits sys_enter_setuid
+          # from a binary that is NOT /usr/bin/sudo or /usr/bin/login -> privesc rule
+          cat > /tmp/se.c <<'EOF'
+          #include <unistd.h>
+          int main(){ setuid(0); return 0; }
+          EOF
+          gcc -o /tmp/setuidtest /tmp/se.c 2>/dev/null || cc -o /tmp/setuidtest /tmp/se.c
+          sudo /tmp/setuidtest || true
+          # also a python doing setuid (another non-standard binary)
+          sudo python3 -c "import os; os.setuid(0)" 2>/dev/null || true
+          sleep 20
